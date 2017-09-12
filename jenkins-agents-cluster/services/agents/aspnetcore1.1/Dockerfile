@@ -1,4 +1,4 @@
-FROM microsoft/aspnetcore-build:2.0.0
+FROM microsoft/aspnetcore-build:1.1
 WORKDIR /app
 
 # Install Python PIP
@@ -13,3 +13,6 @@ RUN pip install ecs-deploy
 
 # Add AWS CLI to PATH
 ENV PATH="~/.local/bin:${PATH}"
+
+# Install docker
+RUN curl -sSL https://get.docker.com/ | sh
