@@ -1,6 +1,7 @@
 import json
 import ntpath
 import requests
+import copy
 from pprint import pprint
 
 class AirWatchClient():
@@ -10,12 +11,14 @@ class AirWatchClient():
         self.url = "https://cn888.awmdm.com"
         self.headers = {
             'aw-tenant-code': "2Uc3HIkYpQoLiNIex03gvTMRdwhjgyHHGRFjOy4L+BQ=",
- #           'content-type': "application/json",
             'accept': "application/json",
             'authorization': "Basic Zm9kbWRtYWRtaW5AZml0bmVzc29uZGVtYW5kMjQ3LmNvbTpGaXRuZXNzT25EZW1hbmQyNDch",
             'cache-control': "no-cache",
             'postman-token': "7038ad62-5984-d186-5061-66eb19203740"
         }
+
+        self.jsonHeaders = copy.copy(self.headers)
+        self.jsonHeaders['content-type'] = 'application/json'
 
     def uploadNewApplicationVersion(self, filePath, organizationGroupID):
         blobID = self.uploadBlob(filePath, organizationGroupID)
@@ -36,6 +39,75 @@ class AirWatchClient():
         content = json.loads(response.content)
         return content["Value"]
 
+    def internalApplicationSave(self, applicationName, deviceModelID, blobID):
+        url = "{baseUrl}/api/mam/apps/internal/begininstall".format(
+            baseUrl = self.url,
+        )        
+
+        data = {
+            'ApplicationName': applicationName,
+            'BlobId': blobID,
+            'AutoUpdateVersion': False,
+            'DeviceType': deviceModelID,
+            'PushMode': 'OnDemand',
+            "SupportedModels": {
+                "Model": [
+                    {
+                        "ModelId": deviceModelID,
+                    }
+                ]
+            }
+        }
+
+        jsonData = json.dumps(data)
+
+        response = requests.post(headers = self.jsonHeaders, url = url, data = jsonData)
+
+        print response.status_code
+        print response.content
+
+    def updateInternalApplication(self, applicationID, blobID):
+        url = "{baseUrl}/api/mam/apps/internal/{applicationID}".format(
+            baseUrl = self.url,
+            applicationID = applicationID
+        )        
+
+        data = {
+        }
+
+        jsonData = json.dumps(data)
+
+        response = requests.put(headers = self.jsonHeaders, url = url, data = jsonData)
+
+        print response.status_code
+        print response.content
+
+    def getInternalApplication(self, applicationID):
+        url = "{baseUrl}/api/mam/apps/internal/{applicationID}".format(
+            baseUrl = self.url,
+            applicationID = applicationID
+        )
+
+        data = {}
+
+        jsonData = json.dumps(data)        
+
+        response = requests.get(headers = self.jsonHeaders, url = url, data = jsonData)
+
+        print response.status_code
+        print response.content
+
+
+
 airWatchClient = AirWatchClient()
 
-airWatchClient.uploadNewApplicationVersion("app-production-release.apk", 799)
+# airWatchClient.uploadNewApplicationVersion("app-production-release15.apk", 799)
+appicationID = 2634
+applicationName = 'FOD Gen5 KSH'
+androidModelID = 5
+blobID = 837977
+airWatchClient.internalApplicationSave(applicationName, androidModelID, blobID)
+
+# airWatchClient.updateInternalApplication(appicationID, blobID)
+
+# airWatchClient.getInternalApplication(appicationID)
