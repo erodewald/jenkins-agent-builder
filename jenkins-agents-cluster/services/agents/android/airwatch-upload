@@ -1,8 +1,26 @@
+#!/usr/bin/env python
+
 import json
 import ntpath
 import requests
 import copy
 from pprint import pprint
+import argparse
+import os
+
+parser = argparse.ArgumentParser(description='upload a new airwatch application version')
+parser.add_argument('applicationID', type=int, help='airwatch application ID')
+parser.add_argument('deviceModelID', type=int, help='airwatch supported device model ID e.g. 5 for Android')
+parser.add_argument('organizationGroupID', type=int, help='airwatch organization group ID')
+parser.add_argument('applicationPath', type=str, help='path to the application file to upload')
+
+args = parser.parse_args()
+
+if 'AW_TENANT_CODE' not in os.environ:
+    raise Exception("AW_TENANT_CODE must be specified via environment variable.")
+
+if 'AW_AUTHORIZATION' not in os.environ:
+    raise Exception("AW_AUTHORIZATION must be specified via environment variable.")
 
 class AirWatchClient():
     def __init__(self):
@@ -10,19 +28,14 @@ class AirWatchClient():
         # AirWatch API settings
         self.url = "https://cn888.awmdm.com"
         self.headers = {
-            'aw-tenant-code': "2Uc3HIkYpQoLiNIex03gvTMRdwhjgyHHGRFjOy4L+BQ=",
+            'aw-tenant-code': os.environ['AW_TENANT_CODE'],
             'accept': "application/json",
-            'authorization': "Basic Zm9kbWRtYWRtaW5AZml0bmVzc29uZGVtYW5kMjQ3LmNvbTpGaXRuZXNzT25EZW1hbmQyNDch",
+            'authorization': "Basic " + os.environ['AW_AUTHORIZATION'],
             'cache-control': "no-cache",
-            'postman-token': "7038ad62-5984-d186-5061-66eb19203740"
         }
 
         self.jsonHeaders = copy.copy(self.headers)
         self.jsonHeaders['content-type'] = 'application/json'
-
-    def uploadNewApplicationVersion(self, filePath, organizationGroupID):
-        blobID = self.uploadBlob(filePath, organizationGroupID)
-        print blobID
 
     def uploadBlob(self, filePath, organizationGroupID):
         filename = ntpath.basename(filePath)
@@ -35,6 +48,9 @@ class AirWatchClient():
         data = open(filePath, 'rb').read()
 
         response = requests.post(headers = self.headers, url = url, data = data)
+
+        if response.status_code != 200 :
+            self.raiseResponseException(response)
 
         content = json.loads(response.content)
         return content["Value"]
@@ -63,8 +79,9 @@ class AirWatchClient():
 
         response = requests.post(headers = self.jsonHeaders, url = url, data = jsonData)
 
-        print response.status_code
-        print response.content
+        if response.status_code != 200 :
+            self.raiseResponseException(response)
+
 
     def updateInternalApplication(self, applicationID, blobID):
         url = "{baseUrl}/api/mam/apps/internal/{applicationID}".format(
@@ -94,20 +111,23 @@ class AirWatchClient():
 
         response = requests.get(headers = self.jsonHeaders, url = url, data = jsonData)
 
-        print response.status_code
-        print response.content
+        if response.status_code != 200 :
+            self.raiseResponseException(response)
 
+        return json.loads(response.content)
 
+    def raiseResponseException(self, response):
+        raise Exception('Got {status} response with content {content}'.format(
+            status = response.status_code, 
+            content = response.content
+        ))
 
 airWatchClient = AirWatchClient()
 
-# airWatchClient.uploadNewApplicationVersion("app-production-release15.apk", 799)
-appicationID = 2634
-applicationName = 'FOD Gen5 KSH'
-androidModelID = 5
-blobID = 837977
-airWatchClient.internalApplicationSave(applicationName, androidModelID, blobID)
+# Get Application name
+applicationDetails = airWatchClient.getInternalApplication(args.applicationID)
+applicationName = applicationDetails["ApplicationName"]
 
-# airWatchClient.updateInternalApplication(appicationID, blobID)
+blobID = airWatchClient.uploadBlob(args.applicationPath, args.organizationGroupID)
 
-# airWatchClient.getInternalApplication(appicationID)
+airWatchClient.internalApplicationSave(applicationName, args.deviceModelID, blobID)

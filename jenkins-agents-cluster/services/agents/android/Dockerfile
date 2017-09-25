@@ -171,3 +171,8 @@ RUN apt-get clean
 
 # ENV BITRISE_DOCKER_REV_NUMBER_ANDROID v2017_08_14_1
 # CMD bitrise -version
+
+
+COPY airwatch-upload /root/.local/bin
+
+ENV PATH="/root/.local/bin:${PATH}"
