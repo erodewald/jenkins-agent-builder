@@ -8,10 +8,10 @@ from pprint import pprint
 import argparse
 import os
 
-parser = argparse.ArgumentParser(description='upload a new airwatch application version')
-parser.add_argument('applicationID', type=int, help='airwatch application ID')
-parser.add_argument('deviceModelID', type=int, help='airwatch supported device model ID e.g. 5 for Android')
-parser.add_argument('organizationGroupID', type=int, help='airwatch organization group ID')
+parser = argparse.ArgumentParser(description='upload a new Airwatch application version')
+parser.add_argument('applicationName', type=str, help='application name to use when saving to Airwatch')
+parser.add_argument('deviceModelID', type=int, help='Airwatch supported device model ID e.g. 5 for Android')
+parser.add_argument('organizationGroupID', type=int, help='Airwatch organization group ID')
 parser.add_argument('applicationPath', type=str, help='path to the application file to upload')
 
 args = parser.parse_args()
@@ -124,10 +124,6 @@ class AirWatchClient():
 
 airWatchClient = AirWatchClient()
 
-# Get Application name
-applicationDetails = airWatchClient.getInternalApplication(args.applicationID)
-applicationName = applicationDetails["ApplicationName"]
-
 blobID = airWatchClient.uploadBlob(args.applicationPath, args.organizationGroupID)
 
-airWatchClient.internalApplicationSave(applicationName, args.deviceModelID, blobID)
+airWatchClient.internalApplicationSave(args.applicationName, args.deviceModelID, blobID)
