@@ -177,6 +177,10 @@ RUN python get-pip.py
 
 RUN pip install requests
 
-COPY airwatch-upload /root/.local/bin/
+COPY airwatch-cli /root/.local/bin/
+
+RUN apt-get install -y build-essential gcc ruby ruby-dev rubygems
+RUN gem install fastlane -NV
+RUN apt-get install -y git
 
 ENV PATH="/root/.local/bin:${PATH}"
