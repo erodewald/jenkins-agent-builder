@@ -7,14 +7,7 @@ import copy
 from pprint import pprint
 import argparse
 import os
-
-parser = argparse.ArgumentParser(description='upload a new Airwatch application version')
-parser.add_argument('applicationName', type=str, help='application name to use when saving to Airwatch')
-parser.add_argument('deviceModelID', type=int, help='Airwatch supported device model ID e.g. 5 for Android')
-parser.add_argument('organizationGroupID', type=int, help='Airwatch organization group ID')
-parser.add_argument('applicationPath', type=str, help='path to the application file to upload')
-
-args = parser.parse_args()
+from distutils.version import StrictVersion
 
 if 'AW_TENANT_CODE' not in os.environ:
     raise Exception("AW_TENANT_CODE must be specified via environment variable.")
@@ -83,13 +76,14 @@ class AirWatchClient():
             self.raiseResponseException(response)
 
 
-    def updateInternalApplication(self, applicationID, blobID):
+    def updateInternalApplication(self, applicationID):
         url = "{baseUrl}/api/mam/apps/internal/{applicationID}".format(
             baseUrl = self.url,
             applicationID = applicationID
         )        
 
         data = {
+            'ApplicationName': 'Test',
         }
 
         jsonData = json.dumps(data)
@@ -116,6 +110,26 @@ class AirWatchClient():
 
         return json.loads(response.content)
 
+    def searchApplications(self, bundleID):
+        url = "{baseUrl}/api/mam/apps/search?bundleid={bundleID}".format(
+            baseUrl = self.url,
+            bundleID = bundleID
+        )   
+
+        response = requests.get(headers = self.jsonHeaders, url = url)
+
+        if response.status_code != 200 :
+            self.raiseResponseException(response)
+
+        return json.loads(response.content)
+
+    def findLatestApplicationByBundleID(self, bundleID):
+        searchResults = self.searchApplications(bundleID)
+
+        result = max(searchResults['Application'], key=lambda item: StrictVersion(item['AppVersion']))
+
+        return result
+
     def raiseResponseException(self, response):
         raise Exception('Got {status} response with content {content}'.format(
             status = response.status_code, 
@@ -124,6 +138,30 @@ class AirWatchClient():
 
 airWatchClient = AirWatchClient()
 
-blobID = airWatchClient.uploadBlob(args.applicationPath, args.organizationGroupID)
+def upload(args):
+    blobID = airWatchClient.uploadBlob(args.applicationPath, args.organizationGroupID)
+    airWatchClient.internalApplicationSave(args.applicationName, args.deviceModelID, blobID)
 
-airWatchClient.internalApplicationSave(args.applicationName, args.deviceModelID, blobID)
+def nextVersion(args):
+    latestApplication = airWatchClient.findLatestApplicationByBundleID(args.bundleID)
+    version = latestApplication["AppVersion"]
+    numbers = version.split('.')
+    print '.'.join([numbers[0], numbers[1], str(int(numbers[2]) + 1)])
+
+
+parser = argparse.ArgumentParser(description='perform airwatch SDK actions')
+subparsers = parser.add_subparsers(help='sub-command help')
+
+uploadParser = subparsers.add_parser('upload', description='upload a new Airwatch application version')
+uploadParser.add_argument('applicationName', type=str, help='application name to use when saving to Airwatch')
+uploadParser.add_argument('deviceModelID', type=int, help='Airwatch supported device model ID e.g. 5 for Android')
+uploadParser.add_argument('organizationGroupID', type=int, help='Airwatch organization group ID')
+uploadParser.add_argument('applicationPath', type=str, help='path to the application file to upload')
+uploadParser.set_defaults(func=upload)
+
+latestVersionParser = subparsers.add_parser('next-version', description='retrieve latest version for an application bundle ID and increments the patch version by one')
+latestVersionParser.add_argument('bundleID', type=str, help='the application bundle ID to find the latest version for')
+latestVersionParser.set_defaults(func=nextVersion)
+
+args = parser.parse_args()
+args.func(args)
