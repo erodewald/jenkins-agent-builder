@@ -12,10 +12,8 @@ find . -name "docker-image.cfg" | while read line; do
 
         eval "$( aws ecr get-login --no-include-email )"
 
-        # Pull down latest docker image to avoid rebuilding if no changes made.
         docker pull "$REPO_URL"
-
-        docker build -t "$IMAGE_NAME" "$IMAGE_DIRECTORY"
+        docker build --cache-from "$REPO_URL" -t "$IMAGE_NAME" "$IMAGE_DIRECTORY"
         docker tag "$IMAGE_TAG" "$REPO_URL"
     )
 done
