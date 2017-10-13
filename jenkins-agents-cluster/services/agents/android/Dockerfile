@@ -179,6 +179,7 @@ RUN pip install requests
 
 COPY airwatch-cli /root/.local/bin/
 
+RUN apt-get update
 RUN apt-get install -y build-essential gcc ruby ruby-dev rubygems
 RUN gem install fastlane -NV
 RUN apt-get install -y git

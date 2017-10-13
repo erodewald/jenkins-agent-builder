@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Finds all docker image configuration files and builds their docker images
+
+find . -name "docker-image.cfg" | while read line; do
+    (
+        source "$line"
+        
+        IMAGE_DIRECTORY="$(dirname $line)"
+        IMAGE_TAG="$IMAGE_NAME:latest"
+        REPO_URL="$REPOSITORY_HOST/$IMAGE_TAG"
+
+        eval "$( aws ecr get-login --no-include-email )"
+
+        # Pull down latest docker image to avoid rebuilding if no changes made.
+        docker pull "$REPO_URL"
+
+        docker build -t "$IMAGE_NAME" "$IMAGE_DIRECTORY"
+        docker tag "$IMAGE_TAG" "$REPO_URL"
+    )
+done
