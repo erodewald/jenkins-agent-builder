@@ -1,5 +1,6 @@
 FROM alpine:3.6
-RUN apk add --no-cache python curl docker py-pip bash
+RUN apk update
+RUN apk add python curl docker py-pip bash
 
 RUN pip install --upgrade --user awscli
 
