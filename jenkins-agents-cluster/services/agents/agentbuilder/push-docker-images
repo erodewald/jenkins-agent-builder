@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 # Finds all docker image configuration files and pushes docker image changes
 # to their corresponding docker repository.
