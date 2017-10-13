@@ -61,7 +61,7 @@ class AirWatchClient():
             'BlobId': blobID,
             'AutoUpdateVersion': False,
             'DeviceType': deviceModelID,
-            'PushMode': 'OnDemand',
+            'PushMode': 'On Demand',
             "SupportedModels": {
                 "Model": [
                     {
