@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 
 import argparse
+import sys
 
 def increment_version(args):
     version = args.version
     numbers = version.split('.')
-    print '.'.join([numbers[0], numbers[1], str(int(numbers[2]) + 1)])
+    sys.stdout.write('.'.join([numbers[0], numbers[1], str(int(numbers[2]) + 1)]))
+    sys.stdout.flush()
 
 parser = argparse.ArgumentParser(description='Increment patch version number of semantic version.')
 

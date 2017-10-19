@@ -9,7 +9,7 @@ pipeline {
         AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
         AWS_DEFAULT_REGION = 'us-east-1'
-        VERSION = sh 'generate-version'
+        VERSION = sh(returnStdout: true, script: 'generate-version')
     }
     stages {
         stage('build') {
@@ -21,8 +21,9 @@ pipeline {
         stage('deploy') {
             steps {
                 sh 'push-docker-images "$VERSION"'
-                sh 'git tag release/$VERSION'
-                sh 'git push origin master'
+                // sh 'git tag release/$VERSION'
+                // sh 'git push origin master'
+                // git branch: 'lts-1.532', credentialsId: '82aa2d26-ef4b-4a6a-a05f-2e1090b9ce17', url: 'git@github.com:jenkinsci/maven-plugin.git'
             }
         }
     }
