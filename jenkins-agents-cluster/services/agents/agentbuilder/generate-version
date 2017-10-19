@@ -1,0 +1,9 @@
+#!/bin/bash
+
+VERSION = eval "$( git describe --tags --match "release/*" --abbrev=0 )"
+if [$? != 0]
+then
+    echo "1.0.0"
+fi
+
+echo eval "$( increment_version $VERSION)"

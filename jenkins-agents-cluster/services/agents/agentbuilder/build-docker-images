@@ -1,19 +1,36 @@
 #!/bin/bash -x
 
-# Finds all docker image configuration files and builds their docker images
+VERSION = $1
 
+# Finds all docker image configuration files and builds their docker images
 find . -name "docker-image.cfg" | while read line; do
     (
         source "$line"
         
         IMAGE_DIRECTORY="$(dirname $line)"
-        IMAGE_TAG="$IMAGE_NAME:latest"
-        REPO_URL="$REPOSITORY_HOST/$IMAGE_TAG"
+        IMAGE_TAG="$IMAGE_NAME:$VERSION"
+        REPO_URL_TAG="$REPOSITORY_HOST/$IMAGE_TAG"
+        LATEST_REPO_TAG="$REPOSITORY_HOST/$IMAGE_NAME:latest"
 
+        # Login to AWS to allow pulling down the image
         eval "$( aws ecr get-login --no-include-email )"
 
-        docker pull "$REPO_URL"
-        docker build --cache-from "$REPO_URL" -t "$IMAGE_NAME" "$IMAGE_DIRECTORY"
-        docker tag "$IMAGE_TAG" "$REPO_URL"
+        # Pull the most recent image from ECR and use it as a cache to speed up
+        # the build and prevent making unnecessary updates.
+        docker pull "$LATEST_REPO_TAG"
+        docker build --cache-from "$LATEST_REPO_TAG" -t "$IMAGE_TAG" "$IMAGE_DIRECTORY"
+
+        # Compare the latest ECR image to what was built. Don't tag new versions if no changes.
+        eval "docker-diff $IMAGE_TAG $LATEST_REPO_TAG"
+        if [$? != 0]
+        then
+            # It's important to push to the specific version and the latest version tags.
+            # That way we can compare future builds to the latest tag.
+            echo "Changes detected in latest build for $IMAGE_NAME"
+            docker tag "$IMAGE_TAG" "$REPO_URL_TAG"
+            docker tag "$IMAGE_TAG" "$LATEST_REPO_TAG"
+        else
+            echo "No new changes detected from build of $IMAGE_NAME"
+        fi
     )
 done

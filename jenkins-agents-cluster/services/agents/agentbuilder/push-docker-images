@@ -3,16 +3,28 @@
 # Finds all docker image configuration files and pushes docker image changes
 # to their corresponding docker repository.
 
+VERSION = $1
+
 find . -name "docker-image.cfg" | while read line; do
     (
         source "$line"
         
         IMAGE_DIRECTORY="$(dirname $line)"
-        IMAGE_TAG="$IMAGE_NAME:latest"
-        REPO_URL="$REPOSITORY_HOST/$IMAGE_TAG"
+        IMAGE_TAG="$IMAGE_NAME:$VERSION"
+        REPO_URL_TAG="$REPOSITORY_HOST/$IMAGE_TAG"
+        LATEST_REPO_TAG="$REPOSITORY_HOST/$IMAGE_NAME:latest"
 
-        eval "$( aws ecr get-login --no-include-email )"
-        
-        docker push "$REPO_URL"
+        # Check if the latest version was tagged in the build process.
+        # If so, push out the tag.
+        eval "$( docker image inspect $IMAGE_TAG )"
+        if [$? = 0]
+        then
+            echo "Pushing $IMAGE_TAG tag since a new version was detected"
+            eval "$( aws ecr get-login --no-include-email )"
+            docker push "$REPO_URL_TAG"
+            docker push "$LATEST_REPO_TAG"
+        else
+            echo "No new version detected for $IMAGE_NAME"
+        fi
     )
 done
