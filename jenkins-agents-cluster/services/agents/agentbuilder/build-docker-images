@@ -1,6 +1,6 @@
 #!/bin/bash -x
 
-VERSION = $1
+VERSION=$1
 
 # Finds all docker image configuration files and builds their docker images
 find . -name "docker-image.cfg" | while read line; do
@@ -22,7 +22,7 @@ find . -name "docker-image.cfg" | while read line; do
 
         # Compare the latest ECR image to what was built. Don't tag new versions if no changes.
         eval "docker-diff $IMAGE_TAG $LATEST_REPO_TAG"
-        if [$? != 0]
+        if [ $? != 0 ]
         then
             # It's important to push to the specific version and the latest version tags.
             # That way we can compare future builds to the latest tag.
