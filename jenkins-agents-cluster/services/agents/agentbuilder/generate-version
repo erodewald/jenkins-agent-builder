@@ -1,10 +1,18 @@
 #!/bin/bash
 
-VERSION=$(git describe --tags --match "release/*" --abbrev=0 2>/dev/null)
-if [ $? != 0 ]
-then
-    printf "1.0.0"
-else
-    # Use string operators to remove the release/ portion of version
-    printf $(increment-version "${VERSION##*/}")
-fi
+printf '1.0.0'
+
+# printf $(hostname)
+# printf $(pwd)
+# printf $(ls -lart)
+# printf $(git status)
+
+
+# VERSION=$(git describe --tags --match "release/*" --abbrev=0)
+# if [ $? != 0 ]
+# then
+#     printf "1.0.0"
+# else
+#     # Use string operators to remove the release/ portion of version
+#     printf $(increment-version "${VERSION##*/}")
+# fi
