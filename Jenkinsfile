@@ -22,18 +22,19 @@ pipeline {
         }
         stage('build') {
             steps {
+                sh 'echo "$VERSION"'
                 // slackSend (color: '#FFFF00', message: "STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-                sh 'build-docker-images "$VERSION"'
+                // sh 'build-docker-images "$VERSION"'
             }
         }
-        stage('deploy') {
-            steps {
-                sh 'push-docker-images "$VERSION"'
-                // sh 'git tag release/$VERSION'
-                // sh 'git push origin master'
-                // git branch: 'lts-1.532', credentialsId: '82aa2d26-ef4b-4a6a-a05f-2e1090b9ce17', url: 'git@github.com:jenkinsci/maven-plugin.git'
-            }
-        }
+        // stage('deploy') {
+        //     steps {
+        //         sh 'push-docker-images "$VERSION"'
+        //         // sh 'git tag release/$VERSION'
+        //         // sh 'git push origin master'
+        //         // git branch: 'lts-1.532', credentialsId: '82aa2d26-ef4b-4a6a-a05f-2e1090b9ce17', url: 'git@github.com:jenkinsci/maven-plugin.git'
+        //     }
+        // }
     }
     // post {
     //     success {
