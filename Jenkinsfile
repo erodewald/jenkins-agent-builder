@@ -15,7 +15,9 @@ pipeline {
     stages {
         stage('generate-version') {
             steps {
-                VERSION = sh(returnStdout: true, script: 'generate-version')
+                script {
+                    VERSION = sh(returnStdout: true, script: 'generate-version')
+                }
             }
         }
         stage('build') {
