@@ -14,19 +14,12 @@ pipeline {
         VERSION = sh(returnStdout: true, script: 'generate-version')
     }
     stages {
-        // stage('generate-version') {
-        //     steps {
-        //         script {
-                    
-        //         }
-        //     }
-        // }
         stage('build') {
             steps {
                 echo "Test: ${VERSION}"
                 sh "echo ${VERSION}"
                 // slackSend (color: '#FFFF00', message: "STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-                // sh 'build-docker-images "$VERSION"'
+                sh "build-docker-images ${VERSION}"
             }
         }
         // stage('deploy') {
