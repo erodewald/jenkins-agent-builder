@@ -1,4 +1,4 @@
-def VERSION = 'UNKNOWN'
+// def VERSION = 'UNKNOWN'
 
 pipeline {
     agent { 
