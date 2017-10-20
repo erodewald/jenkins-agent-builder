@@ -22,7 +22,7 @@ pipeline {
         }
         stage('build') {
             steps {
-                sh 'echo "$VERSION"'
+                echo "Test: ${VERSION}"
                 // slackSend (color: '#FFFF00', message: "STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
                 // sh 'build-docker-images "$VERSION"'
             }
