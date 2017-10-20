@@ -11,15 +11,16 @@ pipeline {
         AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
         AWS_DEFAULT_REGION = 'us-east-1'
+        VERSION = sh(returnStdout: true, script: 'generate-version')
     }
     stages {
-        stage('generate-version') {
-            steps {
-                script {
-                    VERSION = sh(returnStdout: true, script: 'generate-version')
-                }
-            }
-        }
+        // stage('generate-version') {
+        //     steps {
+        //         script {
+                    
+        //         }
+        //     }
+        // }
         stage('build') {
             steps {
                 echo "Test: ${VERSION}"
