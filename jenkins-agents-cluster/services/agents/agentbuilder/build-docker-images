@@ -20,9 +20,11 @@ find . -name "docker-image.cfg" | while read line; do
         docker pull "$LATEST_REPO_TAG"
         docker build --cache-from "$LATEST_REPO_TAG" -t "$IMAGE_TAG" "$IMAGE_DIRECTORY"
 
+        BUILD_ID=$(docker images --format "{{.ID}}" "$IMAGE_TAG")
+        LATEST_ID=$(docker images --format "{{.ID}}" "$LATEST_REPO_TAG")
+
         # Compare the latest ECR image to what was built. Don't tag new versions if no changes.
-        eval "docker-diff $IMAGE_TAG $LATEST_REPO_TAG"
-        if [ $? != 0 ]
+        if [ "$BUILD_ID" != "$LATEST_ID" ]
         then
             # It's important to push to the specific version and the latest version tags.
             # That way we can compare future builds to the latest tag.
