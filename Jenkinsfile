@@ -27,12 +27,12 @@ pipeline {
                 // git credentialsId: 'FOD_AWS_STASH'
                 // sh "git tag release/$VERSION"
                 // sh 'git push origin master'
-                script {
+                // script {
                     sshagent (credentials: ['FOD_AWS_SSH']) {
                         sh "git tag release/$VERSION"
                         sh 'git push origin master --tags'
                     }
-                }
+                // }
 //FOD_AWS_SSH
 
                 // git branch: 'lts-1.532', credentialsId: '82aa2d26-ef4b-4a6a-a05f-2e1090b9ce17', url: 'git@github.com:jenkinsci/maven-plugin.git'
