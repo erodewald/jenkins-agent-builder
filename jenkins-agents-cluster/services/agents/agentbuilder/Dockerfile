@@ -11,10 +11,3 @@ COPY build-docker-images /root/.local/bin/
 COPY push-docker-images /root/.local/bin/
 COPY increment-version /root/.local/bin/
 COPY generate-version /root/.local/bin/
-
-RUN curl -sSL https://raw.githubusercontent.com/moul/docker-diff/master/docker-diff > /root/.local/bin/docker-diff
-RUN chmod +x /root/.local/bin/docker-diff
-
-
-# INSTALL GIT
-# FIX ISSUE WITH VERSION
