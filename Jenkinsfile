@@ -17,6 +17,8 @@ pipeline {
             steps {
                 // Pull into an external script for more generic use.
                 withCredentials([usernamePassword(credentialsId: 'FOD_AWS_STASH', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                    sh('git config --global user.email "none@snapfitness.com"')
+                    sh('git config --global user.name "fodaws"')
                     sh("git tag -a release/$VERSION")
                     // Use git remote get-url origin to get the URL at some point
                     sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@stash.liftbrands.com/scm/fod/jenkins.git --tags')
