@@ -1,0 +1,28 @@
+#!/bin/bash -x
+
+VERSION=$1
+
+# Finds all docker image configuration files and pushes docker image changes
+# to their corresponding docker repository.
+
+find . -name "ecs.cfg" | while read line; do
+    (
+        # Get the ECS cluster and service configurations
+        source "$line"
+        
+        IMAGE_DIRECTORY="$(dirname $line)"
+        IMAGE_TAG="$IMAGE_NAME:$VERSION"
+        REPO_URL_TAG="$REPOSITORY_HOST/$IMAGE_TAG"
+
+        # Check if the latest version was tagged in the build process.
+        # If so, deploy it.
+        docker image inspect "$REPO_URL_TAG" > /dev/null 2>&1
+        if [ $? = 0 ]
+        then
+            echo "Deploying $REPO_URL_TAG tag since a new version was detected"
+            ecs-deploy -c "$ECS_CLUSTER" -n "$ECS_SERVICE" -i "$REPO_URL_TAG"
+        else
+            echo "No new version detected for $IMAGE_NAME"
+        fi
+    )
+done
