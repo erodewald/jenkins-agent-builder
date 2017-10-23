@@ -1,5 +1,3 @@
-// def VERSION = 'UNKNOWN'
-
 pipeline {
     agent { 
         docker {
@@ -16,7 +14,7 @@ pipeline {
     stages {
         stage('build') {
             steps {
-                // slackSend (color: '#FFFF00', message: "STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+                slackSend (color: '#FFFF00', message: "STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
                 sh "build-docker-images ${VERSION}"
             }
         }
@@ -24,37 +22,21 @@ pipeline {
             steps {
                 sh "push-docker-images ${VERSION}"
 
-                // git credentialsId: 'FOD_AWS_STASH'
-                // sh "git tag release/$VERSION"
-                // sh 'git push origin master'
-                // script {
-                    // sshagent (credentials: ['FOD_AWS_SSH']) {
-                    //     sh "git tag release/$VERSION"
-                    //     sh 'git push origin master --tags'
-                    // }
-
                 // Pull into an external script for more generic use.
                 withCredentials([usernamePassword(credentialsId: 'FOD_AWS_STASH', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                     sh("git tag release/$VERSION")
                     // Use git remote get-url origin to get the URL at some point
                     sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@stash.liftbrands.com/scm/fod/jenkins.git --tags')
                 }
-
-
-                // }
-//FOD_AWS_SSH
-
-                // git branch: 'lts-1.532', credentialsId: '82aa2d26-ef4b-4a6a-a05f-2e1090b9ce17', url: 'git@github.com:jenkinsci/maven-plugin.git'
             }
         }
     }
-    // post {
-    //     success {
-    //         slackSend (color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-    //     }
-    //     failure {
-    //         slackSend (color: '#FF0000', message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-    //     }
-    // }
-
+    post {
+        success {
+            slackSend (color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+        }
+        failure {
+            slackSend (color: '#FF0000', message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+        }
+    }
 }
