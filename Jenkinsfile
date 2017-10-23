@@ -27,10 +27,11 @@ pipeline {
                 // git credentialsId: 'FOD_AWS_STASH'
                 // sh "git tag release/$VERSION"
                 // sh 'git push origin master'
-
-                sshagent (credentials: ['FOD_AWS_SSH']) {
-                    sh "git tag release/$VERSION"
-                    sh 'git push origin master --tags'
+                script {
+                    sshagent (credentials: ['FOD_AWS_SSH']) {
+                        sh "git tag release/$VERSION"
+                        sh 'git push origin master --tags'
+                    }
                 }
 //FOD_AWS_SSH
 
