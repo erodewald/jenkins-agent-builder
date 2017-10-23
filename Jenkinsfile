@@ -28,10 +28,19 @@ pipeline {
                 // sh "git tag release/$VERSION"
                 // sh 'git push origin master'
                 // script {
-                    sshagent (credentials: ['FOD_AWS_SSH']) {
-                        sh "git tag release/$VERSION"
-                        sh 'git push origin master --tags'
-                    }
+                    // sshagent (credentials: ['FOD_AWS_SSH']) {
+                    //     sh "git tag release/$VERSION"
+                    //     sh 'git push origin master --tags'
+                    // }
+
+                // Pull into an external script for more generic use.
+                withCredentials([usernamePassword(credentialsId: 'FOD_AWS_STASH', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                    sh("git tag release/$VERSION")
+                    // Use git remote get-url origin to get the URL at some point
+                    sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@stash.liftbrands.com/scm/fod/jenkins.git --tags')
+                }
+
+
                 // }
 //FOD_AWS_SSH
 
