@@ -24,9 +24,9 @@ pipeline {
             steps {
                 sh "push-docker-images ${VERSION}"
 
-                git credentialsId: 'FOD_AWS_STASH'
-                sh "git tag release/$VERSION"
-                sh 'git push origin master'
+                // git credentialsId: 'FOD_AWS_STASH'
+                // sh "git tag release/$VERSION"
+                // sh 'git push origin master'
 
                 sshagent (credentials: ['FOD_AWS_SSH']) {
                     sh "git tag release/$VERSION"
