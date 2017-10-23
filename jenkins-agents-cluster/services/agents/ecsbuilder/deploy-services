@@ -9,6 +9,7 @@ find . -name "ecs.cfg" | while read line; do
     (
         # Get the ECS cluster and service configurations
         source "$line"
+        source "$line/docker-image.cfg"
         
         IMAGE_DIRECTORY="$(dirname $line)"
         IMAGE_TAG="$IMAGE_NAME:$VERSION"
