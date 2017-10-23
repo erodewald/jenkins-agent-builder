@@ -16,7 +16,7 @@ find . -name "docker-image.cfg" | while read line; do
 
         # Check if the latest version was tagged in the build process.
         # If so, push out the tag.
-        docker image inspect "$IMAGE_TAG"
+        docker image inspect "$REPO_URL_TAG" > /dev/null 2>&1
         if [ $? = 0 ]
         then
             echo "Pushing $IMAGE_TAG tag since a new version was detected"
