@@ -14,11 +14,13 @@ pipeline {
     stages {
         stage('Git Tag Version')
         {
-            // Pull into an external script for more generic use.
-            withCredentials([usernamePassword(credentialsId: 'FOD_AWS_STASH', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                sh("git tag -a release/$VERSION")
-                // Use git remote get-url origin to get the URL at some point
-                sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@stash.liftbrands.com/scm/fod/jenkins.git --tags')
+            steps {
+                // Pull into an external script for more generic use.
+                withCredentials([usernamePassword(credentialsId: 'FOD_AWS_STASH', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                    sh("git tag -a release/$VERSION")
+                    // Use git remote get-url origin to get the URL at some point
+                    sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@stash.liftbrands.com/scm/fod/jenkins.git --tags')
+                }
             }
         }
         stage('Build Docker Images') {
