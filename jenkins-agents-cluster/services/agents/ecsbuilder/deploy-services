@@ -22,7 +22,7 @@ find . -name "ecs.cfg" | while read line; do
         if [ $? = 0 ]
         then
             echo "Deploying $REPO_URL_TAG tag since a new version was detected"
-            ecs deploy -c "$ECS_CLUSTER" -n "$ECS_SERVICE" -i "$REPO_URL_TAG"
+            ecs deploy -i "$REPO_URL_TAG" "$ECS_CLUSTER" "$ECS_SERVICE" 
         else
             echo "No new version detected for $IMAGE_NAME"
         fi
