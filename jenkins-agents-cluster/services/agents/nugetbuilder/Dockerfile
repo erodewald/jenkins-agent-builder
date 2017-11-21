@@ -1,5 +1,4 @@
 FROM microsoft/aspnetcore-build:2.0.0
-WORKDIR /app
 USER root
 
 RUN apt-get update && apt-get -y install curl
@@ -9,5 +8,5 @@ RUN mono nuget.exe install
 
 ENV PATH="/root/.local/bin:${PATH}"
 
-COPY latest-repo-pkg-version.sh /root/.local/bin/
-COPY version-compare.sh /root/.local/bin/
+COPY ./latest-repo-pkg-version.sh /root/.local/bin/
+COPY ./version-compare.sh /root/.local/bin/
