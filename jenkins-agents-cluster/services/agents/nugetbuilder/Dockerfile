@@ -10,3 +10,6 @@ ENV PATH="/root/.local/bin:${PATH}"
 
 COPY latest-repo-pkg-version.sh /root/.local/bin/
 COPY version-compare.sh /root/.local/bin/
+
+RUN chmod 755 /root/.local/bin/latest-repo-pkg-version.sh
+RUN chmod 755 /root/.local/bin/version-compare.sh
