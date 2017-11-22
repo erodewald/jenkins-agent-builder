@@ -8,6 +8,8 @@ RUN mono nuget.exe install
 
 ENV PATH="/root/.nuget.NuGet:/root/.local/bin:${PATH}"
 
+RUN echo $PATH
+
 COPY latest-repo-pkg-version.sh /root/.local/bin/
 COPY version-compare.sh /root/.local/bin/
 
