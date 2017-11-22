@@ -7,8 +7,6 @@ RUN wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe -P /root
 
 ENV PATH="/root:/root/.local/bin:${PATH}"
 
-RUN echo $PATH
-
 COPY latest-repo-pkg-version.sh /root/.local/bin/
 COPY version-compare.sh /root/.local/bin/
 
