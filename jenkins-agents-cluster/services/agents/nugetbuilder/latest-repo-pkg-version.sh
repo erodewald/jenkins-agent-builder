@@ -1,5 +1,5 @@
 getLatestPackage () {
-    nuget list $1
+    mono nuget.exe list $1
     latestPackage=$?
     return $latestPackage | cut -d' ' -f2
 }
