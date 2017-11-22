@@ -3,10 +3,10 @@ USER root
 
 RUN apt-get update && apt-get -y install curl
 RUN apt-get -y install mono-complete
-RUN wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
-RUN mono nuget.exe install
+RUN wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe -P /root
+RUN mono /root/nuget.exe install
 
-ENV PATH="/:/root/.nuget.NuGet:/root/.local/bin:${PATH}"
+ENV PATH="/root:/root/.local/bin:${PATH}"
 
 RUN echo $PATH
 
