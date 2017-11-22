@@ -1,6 +1,6 @@
 getLatestPackage () {
     echo $PATH
-    mono /root/nuget.exe list $1
+    mono /root/nuget.exe list "$1"
     latestPackage=$?
     return $latestPackage | cut -d' ' -f2
 }
