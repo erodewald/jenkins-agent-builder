@@ -6,7 +6,7 @@ RUN apt-get -y install mono-complete
 RUN wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
 RUN mono nuget.exe install
 
-ENV PATH="/root/.nuget.NuGet:/root/.local/bin:${PATH}"
+ENV PATH="/:/root/.nuget.NuGet:/root/.local/bin:${PATH}"
 
 RUN echo $PATH
 
